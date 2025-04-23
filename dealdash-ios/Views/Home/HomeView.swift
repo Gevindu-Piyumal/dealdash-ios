@@ -12,62 +12,77 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Search and notification
-                    HStack {
-                        SearchBarView(
-                            text: $vm.searchText,
-                            placeholder: "Search Deals",
-                            showMic: true
-                        ) {
-                            Task { await vm.search() }
-                        }
-                        Button {
-                        } label: {
-                            Image(systemName: "bell")
-                                .font(.title3)
-                        }
-                        .padding(.trailing)
-                    }
-                    .padding(.horizontal)
+            VStack(spacing: 0) {  // Changed to VStack to keep header sticky
+                Divider()  // Divider below search bar
 
-                    if vm.isLoading {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.top, 10)
-                    } else {
-                        // Featured section
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Featured Deals")
-                                .font(.headline)
-                                .padding(.horizontal)
+                ScrollView {
+                    VStack(spacing: 0) {
+                        if vm.isLoading {
+                            ProgressView()
+                                .frame(
+                                    maxWidth: .infinity,
+                                    maxHeight: .infinity
+                                )
+                                .padding(.top, 10)
+                        } else {
+                            // Featured section
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Featured Deals")
+                                    .font(.headline)
+                                    .padding(.horizontal)
+                                    .padding(.top)
 
-                            FeaturedCarouselView(deals: vm.featured)
-                        }
+                                FeaturedCarouselView(deals: vm.featured)
+                            }
 
-                        // All Deals section
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("All Deals")
-                                .font(.headline)
-                                .padding(.horizontal)
+                            // All Deals section
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("All Deals")
+                                    .font(.headline)
+                                    .padding(.horizontal)
 
-                            LazyVStack(spacing: 12) {
-                                ForEach(vm.allDeals) { deal in
-                                    DealRowView(deal: deal)
-                                        .padding(.horizontal)
+                                LazyVStack(spacing: 12) {
+                                    ForEach(
+                                        vm.searchText.isEmpty
+                                            ? vm.allDeals : vm.filteredDeals
+                                    ) { deal in
+                                        DealRowView(deal: deal)
+                                            .padding(.horizontal)
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("DealDash")
                         .font(.title)
-                        .bold()
+                        .fontWeight(.bold)
                 }
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                    } label: {
+                        Image(systemName: "bell")
+                            .font(.title3)
+                    }
+                }
+            }
+            .searchable(
+                text: $vm.searchText,
+                placement: .navigationBarDrawer,
+                prompt: "Search Deals"
+            )
+            .onChange(of: vm.searchText) {
+                Task {
+                    await vm.search()
+                }
+            }
+            .onSubmit(of: .search) {
+                Task { await vm.search() }
             }
             .task { await vm.loadHome() }
         }

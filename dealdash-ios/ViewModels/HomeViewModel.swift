@@ -9,10 +9,11 @@ import Foundation
 
 @MainActor
 class HomeViewModel: ObservableObject {
+    @Published var searchText = ""
     @Published var featured: [Deal] = []
     @Published var allDeals: [Deal] = []
+    @Published var filteredDeals: [Deal] = []
     @Published var isLoading = false
-    @Published var searchText = ""
 
     func loadHome() async {
         isLoading = true
@@ -30,9 +31,16 @@ class HomeViewModel: ObservableObject {
     }
 
     func search() async {
-        guard !searchText.isEmpty else {
-            await loadHome()
+        if searchText.isEmpty {
+            filteredDeals = allDeals
             return
+        }
+
+        let searchQuery = searchText.lowercased()
+        filteredDeals = allDeals.filter { deal in
+            deal.vendor.name.lowercased().contains(searchQuery)
+                || deal.title.lowercased().contains(searchQuery)
+                || deal.description.lowercased().contains(searchQuery)
         }
     }
 }

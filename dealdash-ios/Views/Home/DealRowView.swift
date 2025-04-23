@@ -74,7 +74,7 @@ struct DealRowView_Previews: PreviewProvider {
             .padding()
             .previewLayout(.sizeThatFits)
             .previewDisplayName("Hardcoded Preview")
-            
+
         DealFromAPIPreview()
             .previewDisplayName("API Preview")
     }
@@ -86,10 +86,17 @@ extension Deal {
             id: "sample1",
             title: "Kids dine free on weekends",
             description: "Sample deal description here",
-            banner: URL(string: "https://exgljghcbqshcrapeczd.supabase.co/storage/v1/object/public/deal-images/1745329494124-34792b178d2416bd.jpg")!,
-            category: Category(id: "cat1", name: "Food & Drink", icon: URL(string: "https://via.placeholder.com/32")!),
+            banner: URL(
+                string:
+                    "https://exgljghcbqshcrapeczd.supabase.co/storage/v1/object/public/deal-images/1745329494124-34792b178d2416bd.jpg"
+            )!,
+            category: Category(
+                id: "cat1",
+                name: "Food & Drink",
+                icon: URL(string: "https://via.placeholder.com/32")!
+            ),
             startDate: Date(),
-            expireDate: Date().addingTimeInterval(60*60*24*7),
+            expireDate: Date().addingTimeInterval(60 * 60 * 24 * 7),
             isActive: true,
             isFeatured: true,
             vendor: Vendor(
@@ -108,14 +115,14 @@ extension Deal {
                 ),
                 location: Location(type: "Point", coordinates: [0.0, 0.0])
             ),
-            createdAt: Date().addingTimeInterval(-60*60*24*3)
+            createdAt: Date().addingTimeInterval(-60 * 60 * 24 * 3)
         )
     }
 }
 
 struct DealFromAPIPreview: View {
     @State private var deal: Deal?
-    
+
     var body: some View {
         Group {
             if let deal = deal {
@@ -135,7 +142,7 @@ struct DealFromAPIPreview: View {
                             self.deal = firstDeal
                         }
                     }
-                } catch { }
+                } catch {}
             }
         }
     }
