@@ -8,7 +8,7 @@
 import Foundation
 
 enum Config {
-    static let apiBaseURL = URL(string: "http://192.168.1.3:4000/api")!
+    static let apiBaseURL = URL(string: "http://localhost:4000/api")!
 
     static let requestTimeout: TimeInterval = 30
 

@@ -10,27 +10,35 @@ import SwiftUI
 
 struct FeaturedCarouselView: View {
     let deals: [Deal]
-
+    @State private var currentIndex = 0
+    private let timer = Timer.publish(every: 4, on: .main, in: .common).autoconnect()
+    
     var body: some View {
-        TabView {
-            ForEach(deals) { deal in
-                ZStack(alignment: .bottomLeading) {
-                    KFImage(deal.banner)
-                        .resizable()
-                        .scaledToFill()
-                        .clipped()
-
-                    Text(deal.title)
-                        .font(.subheadline)
-                        .padding(8)
-                        .background(.black.opacity(0.5))
-                        .foregroundColor(.white)
+        VStack(spacing: 8) {
+            TabView(selection: $currentIndex) {
+                ForEach(Array(deals.enumerated()), id: \.element.id) { index, deal in
+                    DealRowView(deal: deal)
+                        .padding(.horizontal)
+                        .tag(index)
                 }
-                .cornerRadius(12)
-                .padding(.horizontal, 8)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 130)
+            .onReceive(timer) { _ in
+                withAnimation {
+                    currentIndex = (currentIndex + 1) % max(1, deals.count)
+                }
+            }
+            
+            HStack(spacing: 6) {
+                ForEach(0..<deals.count, id: \.self) { index in
+                    Circle()
+                        .fill(currentIndex == index ? Color.black : Color.gray.opacity(0.3))
+                        .frame(width: 8, height: 8)
+                }
+            }
+            .padding(.bottom, 4)
         }
-        .tabViewStyle(.page(indexDisplayMode: .always))
     }
 }
 
