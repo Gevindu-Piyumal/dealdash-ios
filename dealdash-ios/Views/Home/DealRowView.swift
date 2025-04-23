@@ -12,43 +12,47 @@ struct DealRowView: View {
     let deal: Deal
 
     var body: some View {
-        HStack(spacing: 12) {
-            KFImage(deal.banner)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 100, height: 100)
-                .cornerRadius(8)
+        NavigationLink(destination: DealDetailView(dealId: deal.id)) {
+            HStack(spacing: 12) {
+                KFImage(deal.banner)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 100, height: 100)
+                    .cornerRadius(8)
 
-            VStack(alignment: .leading, spacing: 6) {
-                Text(deal.vendor.name)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(deal.vendor.name)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .lineLimit(1)
 
-                Text(deal.title)
-                    .font(.footnote)
-                    .foregroundColor(.primary)
-                    .lineLimit(2)
-                    .frame(height: 36, alignment: .top)
-                    .fixedSize(horizontal: false, vertical: true)
+                    Text(deal.title)
+                        .font(.footnote)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                        .frame(height: 36, alignment: .top)
+                        .fixedSize(horizontal: false, vertical: true)
 
-                HStack {
-                    Text(deal.category.name)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(formattedTimeAgo(from: deal.createdAt))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    HStack {
+                        Text(deal.category.name)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(formattedTimeAgo(from: deal.createdAt))
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
-            }
 
-            Image(systemName: "chevron.right")
-                .foregroundColor(.secondary)
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+            }
+            .padding(12)
+            .background(Color(UIColor.secondarySystemBackground))
+            .cornerRadius(12)
         }
-        .padding(12)
-        .background(Color(UIColor.secondarySystemBackground))
-        .cornerRadius(12)
+        .buttonStyle(PlainButtonStyle())
+        .foregroundColor(.primary)
     }
 }
 

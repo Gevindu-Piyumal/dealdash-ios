@@ -12,8 +12,8 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {  // Changed to VStack to keep header sticky
-                Divider()  // Divider below search bar
+            VStack(spacing: 0) {
+                Divider()
 
                 ScrollView {
                     VStack(spacing: 0) {

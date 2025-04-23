@@ -60,4 +60,38 @@ class APIService {
             }
         }
     }
+
+    func fetchDeal(id: String) async throws -> Deal {
+        try await withCheckedThrowingContinuation { continuation in
+            let url = Config.apiBaseURL.appendingPathComponent("deals/\(id)")
+
+            session.request(url)
+                .validate()
+                .responseData { resp in
+                    if let data = resp.data {
+                        do {
+                            let deal = try Config.jsonDecoder.decode(
+                                Deal.self,
+                                from: data
+                            )
+                            continuation.resume(returning: deal)
+                        } catch {
+                            continuation.resume(throwing: error)
+                        }
+                    } else if let error = resp.error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        continuation.resume(
+                            throwing: NSError(
+                                domain: "APIService",
+                                code: -1,
+                                userInfo: [
+                                    NSLocalizedDescriptionKey: "Unknown error"
+                                ]
+                            )
+                        )
+                    }
+                }
+        }
+    }
 }
