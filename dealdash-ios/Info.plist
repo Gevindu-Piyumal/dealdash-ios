@@ -19,5 +19,7 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to find deals near you</string>
 </dict>
 </plist>

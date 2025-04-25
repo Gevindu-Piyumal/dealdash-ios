@@ -18,22 +18,38 @@ struct VendorDetailView: View {
     init(vendor: Vendor) {
         self.vendor = vendor
 
-        print("Vendor location: \(String(describing: vendor.location))")
-
-        // Initialize with default region first
-        let defaultCoordinate = CLLocationCoordinate2D(
-            latitude: 0,
-            longitude: 0
-        )
-        _region = State(
-            initialValue: MKCoordinateRegion(
-                center: defaultCoordinate,
-                span: MKCoordinateSpan(
-                    latitudeDelta: 0.05,
-                    longitudeDelta: 0.05
+        // Initialize with vendor location if available, otherwise use default
+        if let location = vendor.location,
+            location.coordinates.count >= 2
+        {
+            let coordinate = CLLocationCoordinate2D(
+                latitude: location.coordinates[1],
+                longitude: location.coordinates[0]
+            )
+            _region = State(
+                initialValue: MKCoordinateRegion(
+                    center: coordinate,
+                    span: MKCoordinateSpan(
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01
+                    )
                 )
             )
-        )
+        } else {
+            // Default location
+            _region = State(
+                initialValue: MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(
+                        latitude: 6.9271,
+                        longitude: 79.8612
+                    ),
+                    span: MKCoordinateSpan(
+                        latitudeDelta: 0.05,
+                        longitudeDelta: 0.05
+                    )
+                )
+            )
+        }
     }
 
     var body: some View {
@@ -57,7 +73,7 @@ struct VendorDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
-                    
+
                 }) {
                     Image(systemName: "bell")
                         .foregroundColor(.primary)
@@ -81,16 +97,13 @@ struct VendorDetailView: View {
             self.fullVendorDetails = vendorDetails
 
             // Update map region if location is available
-            if let location = vendorDetails.location {
-                print("Fetched vendor location: \(location)")
-                print("Coordinates: \(location.coordinates)")
-
+            if let location = vendorDetails.location,
+                location.coordinates.count >= 2
+            {
                 let coordinate = CLLocationCoordinate2D(
                     latitude: location.coordinates[1],
                     longitude: location.coordinates[0]
                 )
-
-                print("Setting map to coordinate: \(coordinate)")
 
                 // Update the map region
                 self.region = MKCoordinateRegion(
@@ -165,23 +178,29 @@ struct VendorDetailView: View {
                     }
                 )
 
-                // Vendor details
+                // Vendor details - use fullVendorDetails when available
                 VStack(alignment: .leading, spacing: 24) {
-                    infoSection(title: "Address:", detail: vendor.address)
+                    // Get the most complete vendor object
+                    let displayVendor = fullVendorDetails ?? vendor
 
-                    if let hours = vendor.openingHours {
+                    infoSection(
+                        title: "Address:",
+                        detail: displayVendor.address
+                    )
+
+                    if let hours = displayVendor.openingHours {
                         infoSection(title: "Opening Hours:", detail: hours)
                     }
 
-                    if let email = vendor.email {
+                    if let email = displayVendor.email {
                         infoSection(title: "Email:", detail: email)
                     }
 
-                    if let phone = vendor.contactNumber {
+                    if let phone = displayVendor.contactNumber {
                         infoSection(title: "Phone:", detail: phone)
                     }
 
-                    if let socialMedia = vendor.socialMedia {
+                    if let socialMedia = displayVendor.socialMedia {
                         socialMediaSection(socialMedia: socialMedia)
                     }
                 }

@@ -175,4 +175,54 @@ class APIService {
                 }
         }
     }
+
+    func fetchNearbyVendors(
+        longitude: Double,
+        latitude: Double,
+        distance: Double = 100000,
+        category: String = ""
+    ) async throws -> [NearbyVendor] {
+        try await withCheckedThrowingContinuation { continuation in
+            let url = Config.apiBaseURL.appendingPathComponent("vendors/nearby")
+
+            let params: [String: String] = [
+                "longitude": String(longitude),
+                "latitude": String(latitude),
+                "distance": String(distance),
+                "category": category,
+            ]
+
+            session.request(
+                url,
+                parameters: params,
+                encoding: URLEncoding.default
+            )
+            .validate()
+            .responseData { resp in
+                if let data = resp.data {
+                    do {
+                        let vendors = try Config.jsonDecoder.decode(
+                            [NearbyVendor].self,
+                            from: data
+                        )
+                        continuation.resume(returning: vendors)
+                    } catch {
+                        continuation.resume(throwing: error)
+                    }
+                } else if let error = resp.error {
+                    continuation.resume(throwing: error)
+                } else {
+                    continuation.resume(
+                        throwing: NSError(
+                            domain: "APIService",
+                            code: -1,
+                            userInfo: [
+                                NSLocalizedDescriptionKey: "Unknown error"
+                            ]
+                        )
+                    )
+                }
+            }
+        }
+    }
 }

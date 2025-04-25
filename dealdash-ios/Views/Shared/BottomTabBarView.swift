@@ -12,7 +12,7 @@ struct BottomTabBarView: View {
         TabView {
             HomeView().tabItem { Label("Home", systemImage: "house") }
             Text("List").tabItem { Label("List", systemImage: "list.bullet") }
-            Text("Profile").tabItem { Label("Profile", systemImage: "person") }
+            MapView().tabItem { Label("Map", systemImage: "map") }
             Text("Saved").tabItem { Label("Saved", systemImage: "bookmark") }
         }
     }
