@@ -5,13 +5,6 @@
 //  Created by Gevindu Piyumal on 2025-04-24.
 //
 
-//
-//  VendorInfoView.swift
-//  dealdash-ios
-//
-//  Created by Gevindu Piyumal on 2025-04-24.
-//
-
 import Kingfisher
 import SwiftUI
 
@@ -19,58 +12,66 @@ struct VendorInfoView: View {
     let vendor: Vendor
 
     var body: some View {
-        HStack(spacing: 12) {
-            KFImage(vendor.logo)
-                .resizable()
-                .placeholder {
-                    ZStack {
-                        Color(UIColor.systemGray6)
-                        ProgressView()
+        NavigationLink(destination: VendorDetailView(vendor: vendor)) {
+            HStack(spacing: 12) {
+                KFImage(vendor.logo)
+                    .resizable()
+                    .placeholder {
+                        ZStack {
+                            Color(UIColor.systemGray6)
+                            ProgressView()
+                        }
+                    }
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 60, height: 60)
+                    .cornerRadius(8)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(vendor.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    if let openingHours = vendor.openingHours {
+                        Text(openingHours)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+
+                    if let contactNumber = vendor.contactNumber {
+                        Text(contactNumber)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 60, height: 60)
-                .cornerRadius(8)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(vendor.name)
-                    .font(.headline)
+                Spacer()
 
-                if let openingHours = vendor.openingHours {
-                    Text(openingHours)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                if let contactNumber = vendor.contactNumber {
-                    Text(contactNumber)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-
-            Spacer()
-
-            if vendor.contactNumber != nil {
-                Button(action: {
-                    if let phoneNumber = vendor.contactNumber,
-                        let url = URL(
-                            string:
-                                "tel://\(phoneNumber.replacingOccurrences(of: " ", with: ""))"
-                        )
-                    {
-                        UIApplication.shared.open(url)
+                if vendor.contactNumber != nil {
+                    Button(action: {
+                        if let phoneNumber = vendor.contactNumber,
+                            let url = URL(
+                                string:
+                                    "tel://\(phoneNumber.replacingOccurrences(of: " ", with: ""))"
+                            )
+                        {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        Image(systemName: "phone.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.blue)
                     }
-                }) {
-                    Image(systemName: "phone.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.blue)
+                    .buttonStyle(BorderlessButtonStyle())  // Prevent the NavigationLink from capturing this tap
                 }
+
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.gray)
             }
+            .padding()
+            .background(Color(UIColor.systemGray6))
+            .cornerRadius(12)
         }
-        .padding()
-        .background(Color(UIColor.systemGray6))
-        .cornerRadius(12)
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
