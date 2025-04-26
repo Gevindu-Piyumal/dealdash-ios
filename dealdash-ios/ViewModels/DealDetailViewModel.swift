@@ -14,8 +14,10 @@ class DealDetailViewModel: ObservableObject {
     @Published var deal: Deal?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var isBookmarked = false
 
     private let apiService = APIService.shared
+    private let coreDataManager = CoreDataManager.shared
     private var cancellables = Set<AnyCancellable>()
 
     func fetchDealDetails(dealId: String) {
@@ -27,11 +29,28 @@ class DealDetailViewModel: ObservableObject {
                 let fetchedDeal = try await apiService.fetchDeal(id: dealId)
                 self.deal = fetchedDeal
                 self.isLoading = false
+                // Check if deal is already bookmarked
+                self.isBookmarked = coreDataManager.isDealSaved(id: dealId)
             } catch {
                 self.errorMessage = error.localizedDescription
                 self.isLoading = false
             }
         }
+    }
+
+    func toggleBookmark() {
+        guard let deal = deal else { return }
+
+        if isBookmarked {
+            // Remove bookmark
+            coreDataManager.deleteSavedDeal(id: deal.id)
+        } else {
+            // Add bookmark
+            coreDataManager.saveDeal(deal)
+        }
+
+        // Toggle the bookmark state
+        isBookmarked.toggle()
     }
 
     // Format the deal dates for display

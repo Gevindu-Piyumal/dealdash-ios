@@ -87,8 +87,9 @@ struct DealDetailView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
+                    viewModel.toggleBookmark()
                 }) {
-                    Image(systemName: "bookmark")
+                    Image(systemName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
                 }
             }
         }
