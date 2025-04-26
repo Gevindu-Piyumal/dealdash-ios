@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CategoryButton: View {
+struct CategoryButton: View, Equatable {
     let title: String
     @Binding var selectedCategory: String
     let action: () -> Void
@@ -23,5 +23,9 @@ struct CategoryButton: View {
                 .foregroundColor(selectedCategory == title ? .white : .primary)
                 .cornerRadius(20)
         }
+    }
+
+    static func == (lhs: CategoryButton, rhs: CategoryButton) -> Bool {
+        lhs.title == rhs.title && lhs.selectedCategory == rhs.selectedCategory
     }
 }
