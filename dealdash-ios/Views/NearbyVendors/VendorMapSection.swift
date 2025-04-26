@@ -40,29 +40,6 @@ struct VendorMapSection: View {
                 }
                 .padding([.trailing, .bottom], 20)
             }
-
-            VStack {
-                Spacer()
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(vendors) { vendor in
-                            Button(action: {
-                                selectedVendor = vendor
-                            }) {
-                                VendorMapMarker(vendor: vendor)
-                                    .frame(height: 50)
-                                    .padding(8)
-                                    .background(Color.white)
-                                    .cornerRadius(8)
-                                    .shadow(radius: 2)
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-                .frame(height: 80)
-                .background(Color.white.opacity(0.7))
-            }
         }
         .sheet(item: $selectedVendor) { vendor in
             VendorDetailView(vendor: vendor.toVendor())

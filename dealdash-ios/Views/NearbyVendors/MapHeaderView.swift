@@ -15,10 +15,6 @@ struct MapHeaderView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Search Bar
-            SearchBarView(text: $searchText)
-                .padding(.horizontal)
-                .padding(.top, 8)
 
             Divider()
                 .padding(.vertical, 8)
