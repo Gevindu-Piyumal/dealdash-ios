@@ -81,6 +81,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func selectCategory(_ category: String) {
+        guard selectedCategory != category else { return } // Avoid redundant updates
         selectedCategory = category
         Task {
             await fetchVendors()

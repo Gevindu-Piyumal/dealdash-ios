@@ -18,11 +18,30 @@ class APIService {
         return Session(configuration: cfg)
     }()
 
+    // Add a cache property
+    private var cache: [String: Any] = [:]
+
+    private func getCachedData<T>(forKey key: String) -> T? {
+        return cache[key] as? T
+    }
+
+    private func setCachedData<T>(_ data: T, forKey key: String) {
+        cache[key] = data
+    }
+
     func fetchDeals(
         active: Bool = true,
         featured: Bool? = nil
     ) async throws -> [Deal] {
-        try await withCheckedThrowingContinuation { continuation in
+        let cacheKey = "deals_\(active)_\(featured ?? false)"
+        
+        // Check cache first
+        if let cachedDeals: [Deal] = getCachedData(forKey: cacheKey) {
+            return cachedDeals
+        }
+
+        // Fetch from API if not cached
+        return try await withCheckedThrowingContinuation { continuation in
             let url = Config.apiBaseURL.appendingPathComponent("deals")
             var params: [String: String] = ["active": active ? "true" : "false"]
             if let f = featured { params["featured"] = f ? "true" : "false" }
@@ -40,6 +59,8 @@ class APIService {
                             [Deal].self,
                             from: data
                         )
+                        // Cache the data
+                        self.setCachedData(deals, forKey: cacheKey)
                         continuation.resume(returning: deals)
                     } catch {
                         continuation.resume(throwing: error)
@@ -62,7 +83,15 @@ class APIService {
     }
 
     func fetchDeal(id: String) async throws -> Deal {
-        try await withCheckedThrowingContinuation { continuation in
+        let cacheKey = "deal_\(id)"
+        
+        // Check cache first
+        if let cachedDeal: Deal = getCachedData(forKey: cacheKey) {
+            return cachedDeal
+        }
+
+        // Fetch from API if not cached
+        return try await withCheckedThrowingContinuation { continuation in
             let url = Config.apiBaseURL.appendingPathComponent("deals/\(id)")
 
             session.request(url)
@@ -74,6 +103,8 @@ class APIService {
                                 Deal.self,
                                 from: data
                             )
+                            // Cache the data
+                            self.setCachedData(deal, forKey: cacheKey)
                             continuation.resume(returning: deal)
                         } catch {
                             continuation.resume(throwing: error)
@@ -99,7 +130,15 @@ class APIService {
         vendorId: String,
         active: Bool? = nil
     ) async throws -> [Deal] {
-        try await withCheckedThrowingContinuation { continuation in
+        let cacheKey = "deals_vendor_\(vendorId)_\(active ?? false)"
+        
+        // Check cache first
+        if let cachedDeals: [Deal] = getCachedData(forKey: cacheKey) {
+            return cachedDeals
+        }
+
+        // Fetch from API if not cached
+        return try await withCheckedThrowingContinuation { continuation in
             let url = Config.apiBaseURL.appendingPathComponent("deals")
 
             var params: [String: String] = ["vendor": vendorId]
@@ -120,6 +159,8 @@ class APIService {
                             [Deal].self,
                             from: data
                         )
+                        // Cache the data
+                        self.setCachedData(deals, forKey: cacheKey)
                         continuation.resume(returning: deals)
                     } catch {
                         continuation.resume(throwing: error)
@@ -142,7 +183,15 @@ class APIService {
     }
 
     func fetchVendor(id: String) async throws -> Vendor {
-        try await withCheckedThrowingContinuation { continuation in
+        let cacheKey = "vendor_\(id)"
+        
+        // Check cache first
+        if let cachedVendor: Vendor = getCachedData(forKey: cacheKey) {
+            return cachedVendor
+        }
+
+        // Fetch from API if not cached
+        return try await withCheckedThrowingContinuation { continuation in
             let url = Config.apiBaseURL.appendingPathComponent("vendors/\(id)")
 
             session.request(url)
@@ -154,9 +203,10 @@ class APIService {
                                 Vendor.self,
                                 from: data
                             )
+                            // Cache the data
+                            self.setCachedData(vendor, forKey: cacheKey)
                             continuation.resume(returning: vendor)
                         } catch {
-                            print("Error decoding vendor: \(error)")
                             continuation.resume(throwing: error)
                         }
                     } else if let error = resp.error {
@@ -182,7 +232,15 @@ class APIService {
         distance: Double = 100000,
         category: String = ""
     ) async throws -> [NearbyVendor] {
-        try await withCheckedThrowingContinuation { continuation in
+        let cacheKey = "nearby_vendors_\(longitude)_\(latitude)_\(distance)_\(category)"
+        
+        // Check cache first
+        if let cachedVendors: [NearbyVendor] = getCachedData(forKey: cacheKey) {
+            return cachedVendors
+        }
+
+        // Fetch from API if not cached
+        return try await withCheckedThrowingContinuation { continuation in
             let url = Config.apiBaseURL.appendingPathComponent("vendors/nearby")
 
             let params: [String: String] = [
@@ -205,6 +263,8 @@ class APIService {
                             [NearbyVendor].self,
                             from: data
                         )
+                        // Cache the data
+                        self.setCachedData(vendors, forKey: cacheKey)
                         continuation.resume(returning: vendors)
                     } catch {
                         continuation.resume(throwing: error)

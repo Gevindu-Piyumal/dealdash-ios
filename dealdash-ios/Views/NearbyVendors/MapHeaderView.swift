@@ -14,18 +14,10 @@ struct MapHeaderView: View {
     let onCategorySelect: (String) -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Search Bar
-            SearchBarView(text: $searchText)
-                .padding(.horizontal)
-                .padding(.top, 8)
-
-            Divider()
-                .padding(.vertical, 8)
-
-            // Category Selector
+        VStack {
+            // Category buttons
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     ForEach(categories, id: \.self) { category in
                         CategoryButton(
                             title: category,
